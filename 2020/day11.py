@@ -17,8 +17,6 @@ for line in inp:
     larr = [c for c in l]
     _grid.append(larr)
 
-print(_grid)
-
 def neighbors(grid, x, y, part2=False):
     _n = 0
     state = grid[y][x]
@@ -42,76 +40,31 @@ def deepcopy(a):
 
     return x
 
-def step(grid):
+def step(grid, part2=False):
     changed = False
     ngrid = deepcopy(grid)
     occupied = 0
     for y in range(len(grid)):
         for x in range(len(grid[0])):
             state = grid[y][x]
-            n = neighbors(grid, x, y)
+            n = neighbors(grid, x, y, part2)
             #print(x, y, "found",n, "is", state, state == "L")
+            target = 5 if part2 else 4
             if state == "L" and n == 0:
                 ngrid[y][x] = "#"
                 changed = True
-            elif state == "#" and n >= 4:
+            elif state == "#" and n >= target:
                 ngrid[y][x] = "L"
                 changed = True
     if not changed:
         return ngrid
     else:
-        return step(ngrid)
+        return step(ngrid, part2)
 _grid1 = step(_grid)
 
 #pgrid(_grid)
 print(sum([1 for r in _grid1 for c in r if c == "#"]))
 
-
-def step2(grid):
-    changed = False
-    ngrid = deepcopy(grid)
-    occupied = 0
-    for y in range(len(grid)):
-        for x in range(len(grid[0])):
-            state = grid[y][x]
-            n = neighbors(grid, x, y, True)
-            #print(x, y, "found",n, "is", state, state == "L")
-            if state == "L" and n == 0:
-                ngrid[y][x] = "#"
-                changed = True
-            elif state == "#" and n >= 5:
-                ngrid[y][x] = "L"
-                changed = True
-    if not changed:
-        return ngrid
-    else:
-        return step2(ngrid)
-_grid2 = step2(_grid)
+_grid2 = step(_grid, True)
 print("ran step 2")
 print(sum([1 for r in _grid2 for c in r if c == "#"]))
-
-
-
-
-
-print("Testing grid")
-tgrid = [ r for r in """\
-#######
-#######
-#######
-#######
-#######
-#######
-#######\
-""".split("\n")]
-pgrid(tgrid)
-print(neighbors(tgrid, 3, 3, True))
-
-
-
-
-
-
-
-
-
