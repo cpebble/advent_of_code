@@ -1,12 +1,12 @@
 instr = open("day12.input").readlines()
 
-pos = [0, 0]
+pos = 0+0j
 rot = 0
 dirs = {
-        "N": (1, 0),
-        "S": (-1, 0),
-        "E": (0, 1),
-        "W": (0, -1)
+        "N": 1j,
+        "S": -1j,
+        "E": 1,
+        "W": -1,
     }
 rots = ["E", "N", "W", "S"]
 
@@ -14,10 +14,8 @@ def parseIns(pos, rot, i, n):
     npos = pos
     nrot = rot
     if i in dirs:
-        y, x = pos
-        dy, dx = dirs[i]
-        ny, nx = (dy*n + y , dx*n + x)
-        npos = (ny, nx)
+        print(i)
+        npos = pos + (dirs[i] * n)
         #print(f"Moving from {
     elif i == "L":
         if n % 90 != 0:
@@ -36,38 +34,25 @@ def parseIns(pos, rot, i, n):
 for (i, n) in [(x[0], int(x[1:].strip())) for x in instr]:
     pos, rot = parseIns(pos, rot, i, n)
     print(i, n, pos, rot)
-print(abs(pos[0]) + abs(pos[1]))
-
+print(int(abs(pos.real) + abs(pos.imag)))
 # Part 2
 
-pos = (0, 0)
-wayp= (1, 10)
+pos = 0+0j
+wayp= 10+1j
 
 for (i, n) in [(x[0], int(x[1:].strip())) for x in instr]:
     npos = pos
     nrot = rot
     if i in dirs:
-        y, x = wayp
-        dy, dx = dirs[i]
-        ny, nx = (dy*n + y , dx*n + x)
-        wayp = (ny, nx)
-        #print(f"Moving from {
+        wayp = wayp + (dirs[i]*n)
     elif i == "L":
         for _ in range(n // 90):
-            wy, wx = wayp
-            wayp = (wx, -wy)
+            wayp *= 1j
     elif i == "R":
         for _ in range(n // 90):
-            wy, wx = wayp
-            wayp = (-wx, wy)
+            wayp *= -1j
     elif i == "F":
-        y,x = pos
-        dy,dx = wayp
-        #dy = wy + y
-        #dx = wx + x
-        #print(dy, dx, "Moving", dy*n, dx*n)
-        pos = (y + dy*n,x + dx*n)
+        pos += wayp*n
     print(pos, wayp)
 
-print(abs(pos[0]) + abs(pos[1]))
-
+print(int(abs(pos.real) + abs(pos.imag)))
