@@ -1,0 +1,8 @@
+name: day9
+dependencies:
+  - base
+  - unordered-containers
+  - split
+library:
+  source-dirs: .
+

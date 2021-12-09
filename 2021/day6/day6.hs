@@ -41,10 +41,10 @@ readInt :: String -> Int
 readInt = read
 main =
   do
-    handle <- openFile "input" ReadMode
+    handle <- openFile "input2" ReadMode
     cont <- hGetContents handle
     let fishies = map readInt $ breakDrop (==',') cont
     let flist = [count x fishies | x <- [0..10]]
     print flist
-    print $ sum (runRounds2 flist 256)
+    print $ sum (runRounds2 flist 9999999)
     return ()

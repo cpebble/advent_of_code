@@ -1,0 +1,8 @@
+name: day5
+dependencies:
+  - base
+  - unordered-containers
+  - parsec
+library:
+  source-dirs: .
+
