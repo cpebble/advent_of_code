@@ -1,0 +1,8 @@
+name: day10
+dependencies:
+  - base
+  - unordered-containers
+  - parsec
+library:
+  source-dirs: .
+

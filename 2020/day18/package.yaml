@@ -1,0 +1,16 @@
+name: day18
+
+dependencies:
+  - base
+  - parsec
+  - mtl
+
+library: 
+  source-dirs: src
+  exposed_modules: 
+    - Main
+
+executable:
+  source-dirs:
+    - src
+  main: Main.hs

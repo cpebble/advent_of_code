@@ -44,5 +44,5 @@ main =
     let crabs = map readInt $ breakDrop (== ',') cont
         scrabs = sort crabs
         fuels = [(i, countFuel2 scrabs i) | i <- [minimum scrabs .. maximum scrabs]]
-        sfuels = sortBy (\a b -> snd a `compare` snd b) fuels
+        sfuels = take 1 $ sortBy (\a b -> snd a `compare` snd b) fuels
     return sfuels
