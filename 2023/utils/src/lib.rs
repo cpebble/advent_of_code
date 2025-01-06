@@ -28,6 +28,10 @@ pub struct Maze {
     pub maze: Vec<Vec<u8>>,
 }
 
+pub fn load_parts(inp: &str) -> Vec<&str> {
+    inp.split("\n\n").collect()
+}
+
 /// Returns: Height, width, vecvec
 pub fn load_2darr(inp: &str) -> Maze {
     let height: usize = inp.lines().count();
