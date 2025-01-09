@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::fmt::Display;
 use std::fs::File;
 use std::io::Read;
@@ -30,6 +31,21 @@ pub struct Maze {
 
 pub fn load_parts(inp: &str) -> Vec<&str> {
     inp.split("\n\n").collect()
+}
+
+pub fn parse_numbers(inp: &str) -> Vec<isize> {
+    let numregex = Regex::new(r"(-?\d+)").unwrap();
+    numregex
+        .captures_iter(inp)
+        .map(|c| {
+            let (_, [num]) = c.extract();
+            num
+        })
+        .map(|c| {
+            c.parse::<isize>()
+                .expect(&format!("Couldn't parse '{}' as isize", c))
+        })
+        .collect()
 }
 
 /// Returns: Height, width, vecvec
