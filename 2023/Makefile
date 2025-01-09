@@ -4,11 +4,11 @@ example_%: inputs/%.example
 	read q;
 	test ' "$q" == "y" ' && copyq read 0 > $<
 # I.e. skel_day2
-cargo_%: %/Cargo.toml 
+cargo_%: 
 	mkdir $*
 	cp -r .skel/* $*/
 	find $* -type f -exec sed -i "s/{{DAY}}/$*/" {} + ;
 
-skel_%: cargo_% example_%
+skel_%:
 	echo "Hi"
 
