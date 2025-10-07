@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "utils",
+    "day*"
+]
+resolver = "2"
+lints.rust.unused_variables = "allow"
