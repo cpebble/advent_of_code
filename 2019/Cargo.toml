@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "utils",
+    "intcode",
     "day*"
 ]
 resolver = "2"
