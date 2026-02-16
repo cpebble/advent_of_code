@@ -28,6 +28,74 @@ pub struct Maze {
     pub width: usize,
     pub maze: Vec<Vec<u8>>,
 }
+impl Maze {
+    pub fn to_str(&self) -> String {
+        let mut out = String::new();
+        for r in 0..self.height {
+            for c in 0..self.width {
+                out.push(self.maze[r][c].clone() as char);
+            }
+            out.push('\n');
+        }
+        out
+    }
+}
+impl Clone for Maze {
+    fn clone(&self) -> Self {
+        Self {
+            height: self.height.clone(),
+            width: self.width.clone(),
+            maze: self.maze.clone(),
+        }
+    }
+}
+
+pub struct MazeIter<'a> {
+    maze: &'a Maze,
+    r: usize,
+    c: usize,
+    started: bool,
+}
+impl<'a> MazeIter<'a> {
+    pub fn new(m: &'a Maze) -> MazeIter<'a> {
+        MazeIter {
+            maze: m,
+            r: 0,
+            c: 0,
+            started: false,
+        }
+    }
+}
+impl<'a> Iterator for MazeIter<'a> {
+    type Item = (usize, usize, u8);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if !self.started {
+            self.started = true;
+            return Some((self.r, self.c, self.maze.maze[self.r][self.c]));
+        }
+        self.c += 1;
+        if self.c == self.maze.width {
+            self.c = 0;
+            self.r += 1;
+        }
+        if self.r == self.maze.height {
+            None
+        } else {
+            Some((self.r, self.c, self.maze.maze[self.r][self.c]))
+        }
+    }
+}
+
+impl<'a> IntoIterator for &'a Maze {
+    type Item = (usize, usize, u8);
+
+    type IntoIter = MazeIter<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        MazeIter::new(&self)
+    }
+}
 
 pub fn load_parts(inp: &str) -> Vec<&str> {
     inp.split("\n\n").collect()
@@ -84,6 +152,14 @@ pub fn neighbors_2d(r: usize, c: usize, maze: &Maze) -> Vec<(u8, i32, i32)> {
         }
     }
     return neigbors;
+}
+
+pub fn manhattan_distance(a: (usize, usize), b: (usize, usize)) -> usize {
+    let (ar, ac) = a;
+    let (br, bc) = b;
+    let dr = if ar > br { ar - br } else { br - ar };
+    let dc = if ac > bc { ac - bc } else { bc - ac };
+    dr + dc
 }
 
 pub fn strvec<A>(arr: &Vec<A>, sep: &str) -> String
