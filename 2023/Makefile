@@ -15,8 +15,11 @@ inputs/%.input:
 	cp -r .skel/* $*/
 	find $* -type f -exec sed -i "s/{{DAY}}/$*/" {} + ;
 
+day%/description.md:
+	curl "https://adventofcode.com/2023/day/$*" | pandoc -f html -t markdown > day$*/description.md
 
 
-skel_%: inputs/%.example inputs/%.input %/Cargo.toml
+
+skel_%: %/Cargo.toml %/description.md
 	# Ran
 
