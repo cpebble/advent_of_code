@@ -74,7 +74,7 @@ impl IMaze<Tile> {
         out
     }
 }
-impl Clone for Maze {
+impl<A: Clone> Clone for IMaze<A> {
     fn clone(&self) -> Self {
         Self {
             height: self.height.clone(),
@@ -137,6 +137,7 @@ pub enum Tile {
     Hash,
     Dot,
     QMark,
+    Round,
 }
 impl From<char> for Tile {
     fn from(value: char) -> Self {
@@ -144,6 +145,7 @@ impl From<char> for Tile {
             '#' => Tile::Hash,
             '.' => Tile::Dot,
             '?' => Tile::QMark,
+            'O' => Tile::Round,
             _ => todo!(),
         }
     }
@@ -154,7 +156,8 @@ impl Into<char> for Tile {
         match self {
             Tile::Hash => '#',
             Tile::Dot => '.',
-            Tile::QMark => '?'
+            Tile::QMark => '?',
+            Tile::Round => 'O'
         }
     }
 }
