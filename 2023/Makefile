@@ -1,4 +1,4 @@
-.PRECIOUS: inputs/%.input inputs/%.example %/ %/Cargo.toml
+.PRECIOUS: inputs/%.input inputs/%.example %/ %/Cargo.toml day%/description.md
 
 inputs/%.example:
 	echo "Pull example from clip? :"

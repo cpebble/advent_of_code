@@ -23,17 +23,51 @@ pub fn load_input(prod: bool, day: &str) -> String {
     return out;
 }
 
-pub struct Maze {
+pub struct IMaze<A> {
     pub height: usize,
     pub width: usize,
-    pub maze: Vec<Vec<u8>>,
+    pub maze: Vec<Vec<A>>,
 }
-impl Maze {
+
+pub type Maze = IMaze<u8>;
+
+impl From<IMaze<u8>> for IMaze<Tile> {
+    fn from(value: IMaze<u8>) -> Self {
+        let mut m = Vec::new();
+
+        for r in 0..value.height {
+            let mut rv = Vec::new();
+            for c in 0..value.width {
+                rv.push((value.maze[r][c] as char).into());
+            }
+            m.push(rv)
+        }
+        IMaze {
+            height: value.height,
+            width: value.width,
+            maze: m,
+        }
+    }
+}
+
+impl IMaze<u8> {
     pub fn to_str(&self) -> String {
         let mut out = String::new();
         for r in 0..self.height {
             for c in 0..self.width {
                 out.push(self.maze[r][c].clone() as char);
+            }
+            out.push('\n');
+        }
+        out
+    }
+}
+impl IMaze<Tile> {
+    pub fn to_str(&self) -> String {
+        let mut out = String::new();
+        for r in 0..self.height {
+            for c in 0..self.width {
+                out.push(self.maze[r][c].clone().into());
             }
             out.push('\n');
         }
@@ -50,14 +84,14 @@ impl Clone for Maze {
     }
 }
 
-pub struct MazeIter<'a> {
-    maze: &'a Maze,
+pub struct MazeIter<'a, A> {
+    maze: &'a IMaze<A>,
     r: usize,
     c: usize,
     started: bool,
 }
-impl<'a> MazeIter<'a> {
-    pub fn new(m: &'a Maze) -> MazeIter<'a> {
+impl<'a, A> MazeIter<'a, A> {
+    pub fn new(m: &'a IMaze<A>) -> MazeIter<'a, A> {
         MazeIter {
             maze: m,
             r: 0,
@@ -66,8 +100,8 @@ impl<'a> MazeIter<'a> {
         }
     }
 }
-impl<'a> Iterator for MazeIter<'a> {
-    type Item = (usize, usize, u8);
+impl<'a, A: Copy> Iterator for MazeIter<'a, A> {
+    type Item = (usize, usize, A);
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.started {
@@ -87,15 +121,44 @@ impl<'a> Iterator for MazeIter<'a> {
     }
 }
 
-impl<'a> IntoIterator for &'a Maze {
-    type Item = (usize, usize, u8);
+impl<'a, A: Copy> IntoIterator for &'a IMaze<A> {
+    type Item = (usize, usize, A);
 
-    type IntoIter = MazeIter<'a>;
+    type IntoIter = MazeIter<'a, A>;
 
     fn into_iter(self) -> Self::IntoIter {
         MazeIter::new(&self)
     }
 }
+
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum Tile {
+    Hash,
+    Dot,
+    QMark,
+}
+impl From<char> for Tile {
+    fn from(value: char) -> Self {
+        match value {
+            '#' => Tile::Hash,
+            '.' => Tile::Dot,
+            '?' => Tile::QMark,
+            _ => todo!(),
+        }
+    }
+}
+
+impl Into<char> for Tile {
+    fn into(self: Tile) -> char {
+        match self {
+            Tile::Hash => '#',
+            Tile::Dot => '.',
+            Tile::QMark => '?'
+        }
+    }
+}
+
 
 pub fn load_parts(inp: &str) -> Vec<&str> {
     inp.split("\n\n").collect()
