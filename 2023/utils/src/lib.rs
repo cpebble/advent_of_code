@@ -23,6 +23,7 @@ pub fn load_input(prod: bool, day: &str) -> String {
     return out;
 }
 
+#[derive(Eq, PartialEq, Hash)]
 pub struct IMaze<A> {
     pub height: usize,
     pub width: usize,

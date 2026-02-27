@@ -1,10 +1,12 @@
+use std::collections::HashMap;
+
 use utils;
 use utils::Tile;
 
 type Maze = utils::IMaze<Tile>;
 
 fn main() {
-    let inp = utils::load_input(false, "day14");
+    let inp = utils::load_input(true, "day14");
     println!("Part 1: {}", p1(&inp));
     println!("Part 2: {}", p2(&inp));
 }
@@ -87,7 +89,7 @@ fn shift_east_m(mut m_: Maze) -> Maze {
         let mut cur = m_.width - 1;
         for c in (0..m_.width).rev() {
             match m_.maze[r][c] {
-                Tile::Hash => cur -= if c != 0 { 1 } else { 0 },
+                Tile::Hash => cur = if c != 0 { c - 1 } else { 0 },
                 Tile::Dot => {}
                 Tile::Round => {
                     m_.maze[r][c] = Tile::Dot;
@@ -107,10 +109,10 @@ fn p1(inp: &str) -> i32 {
 
     let m2 = shiftNorth(m);
     //println!("{}", m2.to_str());
-    return load(m2).try_into().unwrap();
+    return load(&m2).try_into().unwrap();
 }
 
-fn load(m: Maze) -> usize {
+fn load(m: &Maze) -> usize {
     m.into_iter()
         .map(|(r, c, t)| match t {
             Tile::Round => m.height - r,
@@ -120,24 +122,32 @@ fn load(m: Maze) -> usize {
 }
 fn p2(inp: &str) -> i32 {
     let mut m: Maze = utils::load_2darr(inp).into();
-    for c in 0..1000000000 {
-        if c == 0 {
-            m = shift_north_m(m);
-            println!("{}", m.to_str());
-            m = shift_east_m(m);
-            println!("{}", m.to_str());
-            m = shift_south_m(m);
-            println!("{}", m.to_str());
-            m = shift_west_m(m);
-            println!("{}", m.to_str());
-        } else {
-            m = shift_west_m(shift_south_m(shift_east_m(shift_north_m(m))));
-            if c <= 3 {
-                println!("After {} Cycles: \n{}", c, m.to_str());
+    let mut seen: HashMap<Maze, i32> = HashMap::new();
+    let mut c: i32 = 0;
+    while c < 1000000000 {
+        match seen.get(&m) {
+            Some(i) => {
+                println!("Saw maze at {}, first seen {}", c, i);
+                let cycle_length = c - i;
+
+                while c+cycle_length < 1000000000 {
+                    c += cycle_length;
+                }
+                println!("{}", c);
+                while c < 1000000000 {
+                    // println!("load: {}", load(&m));
+                    m = shift_east_m(shift_south_m(shift_west_m(shift_north_m(m))));
+                    c += 1
+                }
+            }
+            None => {
+                seen.insert(m.clone(), c);
+                m = shift_east_m(shift_south_m(shift_west_m(shift_north_m(m))));
+                c += 1;
             }
         }
     }
-    return load(m).try_into().unwrap();
+    return load(&m).try_into().unwrap();
 }
 
 #[cfg(test)]
@@ -209,5 +219,26 @@ O...
 OO#O
 "
         );
+    }
+
+    #[test]
+    pub fn testStones() {
+        let actual = ".#.\n#O#\n.#.\n";
+        let m: Maze = utils::load_2darr(actual).into();
+        let m2 = shift_north_m(m);
+        assert_eq!(m2.to_str(), actual);
+        let m3 = shift_east_m(m2);
+        assert_eq!(m3.to_str(), actual);
+        let m4 = shift_south_m(m3);
+        assert_eq!(m4.to_str(), actual);
+        let m5 = shift_west_m(m4);
+        assert_eq!(m5.to_str(), actual);
+    }
+    #[test]
+    pub fn testEast() {
+        let actual = "...O.#.O#.O";
+        let m: Maze = utils::load_2darr(actual).into();
+        let m2 = shift_east_m(m);
+        assert_eq!(m2.to_str(), "....O#.O#.O\n");
     }
 }

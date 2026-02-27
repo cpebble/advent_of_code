@@ -88,3 +88,14 @@ To play, please identify yourself via one of these services:
 [\[GitHub\]](/auth/github) [\[Google\]](/auth/google)
 [\[Twitter\]](/auth/twitter) [\[Reddit\]](/auth/reddit) [- [\[How Does
 Auth Work?\]](/2023/about#faq_auth)]{.quiet}
+
+This process should work if you leave it running long enough, but you're still
+worried about the north support beams. To make sure they'll survive for a
+while, you need to calculate the total load on the north support beams after
+1000000000 cycles.
+
+In the above example, after 1000000000 cycles, the total load on the north
+support beams is 64.
+
+Run the spin cycle for 1000000000 cycles. Afterward, what is the total load on
+the north support beams?
