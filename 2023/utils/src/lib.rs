@@ -31,6 +31,7 @@ pub struct IMaze<A> {
 }
 
 pub type Maze = IMaze<u8>;
+pub type TMaze = IMaze<Tile>;
 
 impl From<IMaze<u8>> for IMaze<Tile> {
     fn from(value: IMaze<u8>) -> Self {
@@ -47,6 +48,27 @@ impl From<IMaze<u8>> for IMaze<Tile> {
             height: value.height,
             width: value.width,
             maze: m,
+        }
+    }
+}
+
+impl<A> IMaze<A> {
+    pub fn generate<F>(height: usize, width: usize, f: F) -> IMaze<A>
+    where
+        F: Fn(usize, usize) -> A,
+    {
+        let mut arr: Vec<Vec<A>> = Vec::new();
+        for r in 0..height {
+            let mut row = Vec::new();
+            for c in 0..width {
+                row.push(f(r, c));
+            }
+            arr.push(row);
+        }
+        IMaze {
+            height: height,
+            width: width,
+            maze: arr
         }
     }
 }
@@ -132,13 +154,16 @@ impl<'a, A: Copy> IntoIterator for &'a IMaze<A> {
     }
 }
 
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Tile {
     Hash,
     Dot,
     QMark,
     Round,
+    FSlash,
+    BSlash,
+    Dash,
+    Pipe,
 }
 impl From<char> for Tile {
     fn from(value: char) -> Self {
@@ -147,6 +172,10 @@ impl From<char> for Tile {
             '.' => Tile::Dot,
             '?' => Tile::QMark,
             'O' => Tile::Round,
+            '/' => Tile::FSlash,
+            '\\' => Tile::BSlash,
+            '-' => Tile::Dash,
+            '|' => Tile::Pipe,
             _ => todo!(),
         }
     }
@@ -158,11 +187,34 @@ impl Into<char> for Tile {
             Tile::Hash => '#',
             Tile::Dot => '.',
             Tile::QMark => '?',
-            Tile::Round => 'O'
+            Tile::Round => 'O',
+            Tile::FSlash => '/',
+            Tile::BSlash => '\\',
+            Tile::Dash => '-',
+            Tile::Pipe => '|',
         }
     }
 }
-
+impl Into<char> for &Tile {
+    fn into(self) -> char {
+        match self {
+            Tile::Hash => '#',
+            Tile::Dot => '.',
+            Tile::QMark => '?',
+            Tile::Round => 'O',
+            Tile::FSlash => '/',
+            Tile::BSlash => '\\',
+            Tile::Dash => '-',
+            Tile::Pipe => '|',
+        }
+    }
+}
+impl Display for Tile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let c: char = self.into();
+        return write!(f, "{}", c);
+    }
+}
 
 pub fn load_parts(inp: &str) -> Vec<&str> {
     inp.split("\n\n").collect()
@@ -192,6 +244,19 @@ pub fn load_2darr(inp: &str) -> Maze {
         arr.push(Vec::from(l));
     }
     return Maze {
+        height,
+        width,
+        maze: arr,
+    };
+}
+pub fn load_2d_tile_arr(inp: &str) -> TMaze {
+    let height: usize = inp.lines().count();
+    let width: usize = inp.lines().next().unwrap().len();
+    let mut arr: Vec<Vec<Tile>> = Vec::new();
+    for l in inp.lines() {
+        arr.push(l.chars().map(Tile::from).collect())
+    }
+    return TMaze {
         height,
         width,
         maze: arr,
