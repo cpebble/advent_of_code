@@ -23,7 +23,7 @@ pub fn load_input(prod: bool, day: &str) -> String {
     return out;
 }
 
-#[derive(Eq, PartialEq, Hash)]
+#[derive(Eq, PartialEq, Hash, Debug)]
 pub struct IMaze<A> {
     pub height: usize,
     pub width: usize,
@@ -68,8 +68,44 @@ impl<A> IMaze<A> {
         IMaze {
             height: height,
             width: width,
-            maze: arr
+            maze: arr,
         }
+    }
+    pub fn n_edge(&self) -> impl Iterator<Item = (usize, usize)> + '_ {
+        (0..self.width).map(|c| (0, c))
+    }
+    pub fn s_edge(&self) -> impl Iterator<Item = (usize, usize)> + '_ {
+        (0..self.width).map(|c| (self.height - 1, c))
+    }
+    pub fn w_edge(&self) -> impl Iterator<Item = (usize, usize)> + '_ {
+        (0..self.height).map(|r| (r, 0))
+    }
+    pub fn e_edge(&self) -> impl Iterator<Item = (usize, usize)> + '_ {
+        (0..self.height).map(|r| (r, self.width - 1))
+    }
+    pub fn edges(&self) -> impl Iterator<Item = (usize, usize)> + '_ {
+        self.n_edge()
+            .chain(self.s_edge())
+            .chain(self.w_edge())
+            .chain(self.e_edge())
+    }
+}
+impl<A: Copy> IMaze<A> {
+    pub fn neighbors(&self, r: usize, c: usize) -> Vec<(A, usize, usize)> {
+        let w = self.width as isize;
+        let h = self.height as isize;
+        let mut neigbors: Vec<(A, usize, usize)> = Vec::new();
+        for (dy, dx) in I_GRID_DIRECTIONS.iter() {
+            let (nr, nc) = ((r as isize) + *dy, (c as isize) + *dx);
+            if 0 <= nr && nr < h && 0 <= nc && nc < w {
+                neigbors.push((
+                    self.maze[nr as usize][nc as usize],
+                    nr.try_into().unwrap(),
+                    nc.try_into().unwrap(),
+                ));
+            }
+        }
+        return neigbors;
     }
 }
 
@@ -264,6 +300,16 @@ pub fn load_2d_tile_arr(inp: &str) -> TMaze {
 }
 pub const COMPASS_DIRECTIONS: [(i32, i32); 4] = [(-1, 0), (0, 1), (1, 0), (0, -1)];
 pub const GRID_DIRECTIONS: [(i32, i32); 8] = [
+    (-1, 0),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
+    (1, 0),
+    (1, -1),
+    (0, -1),
+    (-1, -1),
+];
+pub const I_GRID_DIRECTIONS: [(isize, isize); 8] = [
     (-1, 0),
     (-1, 1),
     (0, 1),
