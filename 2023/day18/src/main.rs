@@ -34,7 +34,11 @@ fn main() {
     println!("Part 1: {}", p1(&inp));
     println!("Part 2: {}", p2(&inp));
 }
-fn p1(inp: &str) -> usize {
+// Non-working; initial approach:
+// 1. Transform polygon into a Maze
+// 2. Flood-fill from edges
+// 3. Subtract area from edge to trench
+fn trenchmethod(inp: &str) -> usize {
     // First  split up input
     let mut instrs: Vec<DInst> = inp.lines().map(parse_inst).collect();
     // For data shaping, calculate visited coords
@@ -109,15 +113,105 @@ fn p1(inp: &str) -> usize {
     let filled_trench = TMaze::generate(h_calc + 1, w_calc + 1, |r, c| {
         if edgeset.contains(&(r, c)) {
             Tile::Round
-        } else { trench.maze[r][c].clone() }
+        } else {
+            trench.maze[r][c].clone()
+        }
     });
     //println!("{}", filled_trench.to_str());
     // Return the area, without edges
-    return filled_trench.into_iter().map(|(_,_,el)| if el == Tile::Round { 0 } else { 1 }).sum();
+    return filled_trench
+        .into_iter()
+        .map(|(_, _, el)| if el == Tile::Round { 0 } else { 1 })
+        .sum();
     // return (trench.height * trench.width) - edgeset.len();
 }
-fn p2(inp: &str) -> i32 {
-    return 0;
+
+fn p1(inp: &str) -> isize {
+    let instrs: Vec<DInst> = inp.lines().map(parse_inst).collect();
+    let coords: Vec<(isize, isize)> = instrs
+        .iter()
+        .scan((0 as isize, 0 as isize), |(x, y), el| {
+            let len: isize = el.len.try_into().unwrap();
+            let (x_, y_) = match el.dir {
+                Dir::East => (*x + len, *y),
+                Dir::West => (*x - len, *y),
+                Dir::North => (*x, *y + len),
+                Dir::South => (*x, *y - len),
+            };
+            *x = x_;
+            *y = y_;
+            Some((x_, y_))
+        })
+        .collect();
+    let mut arr = 0;
+    let N = coords.len();
+    for i in 0..N {
+        //println!("{i}: {:?} -> {:?}", coords[i], coords[(i+1) % N]);
+        arr += utils::determinant_2x2(
+            coords[i].0,
+            coords[i].1,
+            coords[(i + 1) % N].0,
+            coords[(i + 1) % N].1,
+        );
+    }
+    let arr = isize::abs(arr);
+    // Try to reorder pick's theorem
+    let boundary_points: isize = instrs
+        .iter()
+        .fold(0, |acc, el| acc + (*el).len)
+        .try_into()
+        .unwrap();
+    //println!("{boundary_points}");
+
+    // A = i + b/2 - 1
+    // A - (b/2) = i - 1
+    let interior = (arr / 2) - (boundary_points / 2) + 1;
+    //println!("{interior}");
+    return interior + boundary_points;
+    //return arr / 2;
+}
+
+fn p2(inp: &str) -> isize {
+    let instrs: Vec<DInst> = inp.lines().map(parse_inst_2).collect();
+    let coords: Vec<(isize, isize)> = instrs
+        .iter()
+        .scan((0 as isize, 0 as isize), |(x, y), el| {
+            let len: isize = el.len.try_into().unwrap();
+            let (x_, y_) = match el.dir {
+                Dir::East => (*x + len, *y),
+                Dir::West => (*x - len, *y),
+                Dir::North => (*x, *y + len),
+                Dir::South => (*x, *y - len),
+            };
+            *x = x_;
+            *y = y_;
+            Some((x_, y_))
+        })
+        .collect();
+    let mut arr = 0;
+    let N = coords.len();
+    for i in 0..N {
+        //println!("{i}: {:?} -> {:?}", coords[i], coords[(i+1) % N]);
+        arr += utils::determinant_2x2(
+            coords[i].0,
+            coords[i].1,
+            coords[(i + 1) % N].0,
+            coords[(i + 1) % N].1,
+        );
+    }
+    let arr = isize::abs(arr);
+    // Try to reorder pick's theorem
+    let boundary_points: isize = instrs
+        .iter()
+        .fold(0, |acc, el| acc + (*el).len)
+        .try_into()
+        .unwrap();
+
+    // A = i + b/2 - 1
+    // A - (b/2) = i - 1
+    let interior = (arr / 2) - (boundary_points / 2) + 1;
+
+    return interior + boundary_points;
 }
 
 fn parse_inst(inp: &str) -> DInst {
@@ -131,6 +225,22 @@ fn parse_inst(inp: &str) -> DInst {
             s => panic!("Direction not recognized: {s}"),
         },
         len: lsplit[1].parse::<usize>().unwrap(),
+        color: parse_col(lsplit[2]),
+    }
+}
+fn parse_inst_2(inp: &str) -> DInst {
+    let lsplit: Vec<&str> = inp.split(' ').collect();
+
+    let trimmed = lsplit[2].trim_start_matches("(#").trim_end_matches(")");
+    DInst {
+        dir: match trimmed.chars().nth(5).unwrap() {
+            '0' => Dir::East,
+            '1' => Dir::South,
+            '2' => Dir::West,
+            '3' => Dir::North,
+            s => panic!("Direction not recognized:{} {s}", lsplit[2]),
+        },
+        len: usize::from_str_radix(&trimmed[0..5], 16).unwrap(),
         color: parse_col(lsplit[2]),
     }
 }

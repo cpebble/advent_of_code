@@ -354,6 +354,10 @@ where
     return s;
 }
 
+pub fn determinant_2x2(a: isize, b: isize, c: isize, d: isize) -> isize{
+    (a * d) - (b * c)
+}
+
 #[cfg(test)]
 mod tests {
 

@@ -20,6 +20,6 @@ day%/description.md:
 
 
 
-skel_%: %/Cargo.toml %/description.md
+skel_%: %/description.md %/Cargo.toml 
 	# Ran
 

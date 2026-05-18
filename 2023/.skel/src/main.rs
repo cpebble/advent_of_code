@@ -5,9 +5,9 @@ fn main() {
     println!("Part 1: {}", p1(&inp));
     println!("Part 2: {}", p2(&inp));
 }
-fn p1(inp: &str) -> i32{
+fn p1(inp: &str) -> usize{
     return 0;
 }
-fn p2(inp: &str) -> i32{
+fn p2(inp: &str) -> usize{
     return 0;
 }
