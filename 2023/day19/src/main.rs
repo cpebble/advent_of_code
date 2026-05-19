@@ -6,8 +6,8 @@ use std::{
 use utils;
 
 fn main() {
-    let inp = utils::load_input(false, "day19");
-    //println!("Part 1: {}", p1(&inp));
+    let inp = utils::load_input(true, "day19");
+    println!("Part 1: {}", p1(&inp));
     println!("Part 2: {}", p2(&inp));
 }
 
@@ -319,10 +319,10 @@ impl PartRange {
     }
 
     fn val(&self) -> usize {
-        (self.x.upper - self.x.lower) * 
-        (self.m.upper - self.m.lower) * 
-        (self.a.upper - self.a.lower) * 
-        (self.s.upper - self.s.lower)
+        ((self.x.upper - self.x.lower) + 1 )* 
+        ((self.m.upper - self.m.lower) + 1 )* 
+        ((self.a.upper - self.a.lower) + 1 )* 
+        ((self.s.upper - self.s.lower) + 1 )
     }
 
     fn split(&self, cond: &Cond) -> (Option<PartRange>, Option<PartRange>) {
@@ -424,7 +424,6 @@ fn p2(inp: &str) -> usize {
     }
     let mut sum = 0;
     for p in &passing_parts {
-        println!("{}", p.fmt());
         sum += p.val();
     }
 
